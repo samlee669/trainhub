@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>訓練Hub 入口</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(160deg, #003387 0%, #0066AA 60%, #0099CC 100%);
+    min-height: 100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; padding:24px; text-align:center;
+  }
+  .card {
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(12px);
+    border-radius: 20px; padding: 40px 32px; max-width: 420px; width:100%;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .logo { font-size: 48px; margin-bottom: 12px; }
+  h1 { font-size: 28px; margin-bottom: 8px; letter-spacing: 1px; }
+  .sub { font-size: 14px; opacity: 0.85; margin-bottom: 28px; }
+  .btn {
+    display:block; width:100%; padding: 16px; border-radius: 12px;
+    background:#fff; color:#003387; font-size:18px; font-weight:700;
+    text-decoration:none; margin-bottom: 14px; transition: transform 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .status {
+    font-size: 13px; opacity:0.9; padding:12px; border-radius:10px;
+    background: rgba(0,0,0,0.2); margin-top:6px;
+  }
+  .status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+  .online .dot { background:#4cd964; }
+  .offline .dot { background:#ff3b30; }
+  .footer { font-size: 11px; opacity:0.6; margin-top:20px; }
+  #countdown { font-weight:700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🎓</div>
+  <h1>訓練Hub</h1>
+  <div class="sub">GBLM 英文簡報特訓 · Edge AI 產品訓練</div>
+
+  <a id="enterBtn" class="btn" href="#" target="_blank">🚀 進入訓練Hub</a>
+
+  <div id="status" class="status offline">
+    <span class="dot"></span><span id="statusText">正在檢查服務狀態…</span>
+  </div>
+
+  <div class="footer">
+    入口頁固定網址（永不失效）<br>
+    <span id="countdown">重新整理倒數：--</span><br>
+    頁面每 60 秒自動更新服務網址
+  </div>
+</div>
+
+<script>
+// 目前有效服務網址（每次 start.sh 重啟後由 sync script 更新）
+var CURRENT_URL = "Binary file (standard input) matches";
+
+// 自動導向
+document.getElementById("enterBtn").href = CURRENT_URL;
+
+// 每 60 秒重新載入，取得最新網址
+var sec = 60;
+setInterval(function() {
+  sec--;
+  document.getElementById("countdown").textContent = "重新整理倒數：" + sec + " 秒";
+  if (sec <= 0) { location.reload(); }
+}, 1000);
+
+// 檢查服務是否在線
+fetch(CURRENT_URL + "/api/overview", { mode: "no-cors" })
+  .then(function() {
+    var s = document.getElementById("status");
+    s.className = "status online";
+    document.getElementById("statusText").textContent = "✅ 服務在線，點上方按鈕進入";
+  })
+  .catch(function() {
+    document.getElementById("statusText").textContent = "⚠️ 服務重新啟動中，請稍後再試";
+  });
+</script>
+</body>
+</html>
